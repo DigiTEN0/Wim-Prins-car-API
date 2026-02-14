@@ -154,14 +154,24 @@ ${voorraadLijst}`;
     try {
       console.log(`3. Attempt ${attempt + 1}/3`);
       
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents,
-          systemInstruction: SYSTEM_INSTRUCTION
-        })
-      });
+      const response = await fetch(
+        `https://corsproxy.io/?${encodeURIComponent(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDXJsIrNv5bLD2G5oRLTgX7iBGRaCfkV-w`)}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents,
+            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
+            generationConfig: { temperature: 0, topP: 0.1 }
+          })
+        }
+      );
+      
+      const data = await response.json();
+      
+      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return data.candidates[0].content.parts[0].text;
+      }
 
       console.log(`4. Response status: ${response.status}`);
       console.log(`5. Response OK: ${response.ok}`);
