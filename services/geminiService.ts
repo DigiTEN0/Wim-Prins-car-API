@@ -13,10 +13,9 @@ const COLOR_MAP: Record<string, string[]> = {
 
 export async function laadVoorraad(): Promise<void> {
   try {
-    const proxy = "https://corsproxy.io/?";
     const url = "https://wimprins.nl/vehicles.json?task=inventory&rid=10&world=all&page=1&limit=999";
 
-    const response = await fetch(proxy + encodeURIComponent(url), {
+    const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
@@ -151,7 +150,7 @@ ${voorraadLijst}`;
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDXJsIrNv5bLD2G5oRLTgX7iBGRaCfkV-w`;
       
       const response = await fetch(
-        `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`,
+        `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
