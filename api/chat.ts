@@ -22,7 +22,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return res.status(500).json({ error: 'API key not configured' });
     }
 
-    // FIX: Correct Google Gemini API endpoint with API key in URL
+    // Format systemInstruction correctly for Gemini API
+    const formattedSystemInstruction = typeof systemInstruction === 'string' 
+      ? { parts: [{ text: systemInstruction }] }
+      : systemInstruction;
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
       {
@@ -32,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         },
         body: JSON.stringify({
           contents,
-          systemInstruction,
+          systemInstruction: formattedSystemInstruction,
           generationConfig: {
             temperature: 0,
             topP: 0.1
