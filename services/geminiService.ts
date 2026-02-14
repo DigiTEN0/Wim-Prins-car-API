@@ -105,9 +105,6 @@ async function sleep(ms: number) {
 }
 
 export async function getChatResponse(userMessage: string, history: Message[], userData?: UserData): Promise<string> {
-  console.log("=== DEBUG START ===");
-  console.log("1. Calling /api/chat endpoint");
-  
   const voorraadLijst = STOCK.map(a =>
     `ID: ${a.id} | ${a.brand} ${a.model} | Prijs: ${a.price} | Jaar: ${a.year} | KM: ${a.mileage} | Vermogen: ${a.power}pk | Kleur: ${a.color} | URL: ${a.url}`
   ).join("\n");
@@ -147,15 +144,14 @@ ${voorraadLijst}`;
     { role: 'user' as any, parts: [{ text: userMessage }] }
   ];
 
-  console.log("2. Payload ready, making fetch call...");
-  
   let lastError = null;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      console.log(`3. Attempt ${attempt + 1}/3`);
+      // Direct call to Google via CORS proxy (no backend needed!)
+      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDXJsIrNv5bLD2G5oRLTgX7iBGRaCfkV-w`;
       
       const response = await fetch(
-        `https://corsproxy.io/?${encodeURIComponent(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDXJsIrNv5bLD2G5oRLTgX7iBGRaCfkV-w`)}`,
+        `https://corsproxy.io/?${encodeURIComponent(apiUrl)}`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -166,39 +162,21 @@ ${voorraadLijst}`;
           })
         }
       );
-      
-      const data = await response.json();
-      
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        return data.candidates[0].content.parts[0].text;
-      }
 
-      console.log(`4. Response status: ${response.status}`);
-      console.log(`5. Response OK: ${response.ok}`);
-      
-      const data = await response.json();
-      console.log("6. Response data:", data);
+      const responseData = await response.json();
 
       if (!response.ok) {
-        console.error("7. ERROR - Response not OK:", data);
-        throw new Error(data.error || 'API call failed');
+        throw new Error(responseData.error?.message || 'API call failed');
       }
 
-      if (data.candidates?.[0]?.content?.parts?.[0]?.text) {
-        console.log("8. SUCCESS - Got response text");
-        console.log("=== DEBUG END ===");
-        return data.candidates[0].content.parts[0].text;
+      if (responseData.candidates?.[0]?.content?.parts?.[0]?.text) {
+        return responseData.candidates[0].content.parts[0].text;
       }
-      
-      console.log("9. No text in response");
     } catch (err: any) {
-      console.error(`10. CATCH ERROR on attempt ${attempt + 1}:`, err);
       lastError = err;
       await sleep(1000 * (attempt + 1));
     }
   }
 
-  console.log("11. FAILED after 3 attempts");
-  console.log("=== DEBUG END ===");
   return "Mijn excuses, het lukt momenteel niet om de collectie te raadplegen. Probeer het over enkele ogenblikken nogmaals.";
 }
