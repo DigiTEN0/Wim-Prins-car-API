@@ -13,12 +13,18 @@ const COLOR_MAP: Record<string, string[]> = {
 
 export async function laadVoorraad(): Promise<void> {
   try {
-    const url = "https://wimprins.nl/vehicles.json?task=inventory&rid=10&world=all&page=1&limit=999";
-
-    const response = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`, {
+    // Try direct fetch first (might work without CORS proxy)
+    const url = "https://wimprins.nl/vehicles.json";
+    
+    const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ 
+        task: "inventory",
+        rid: 10,
+        world: "all",
+        page: 1,
+        limit: 999,
         sortby:"none", brand:"all", model:"all", type:"all", year:"all", 
         fuel:"all", transmission:"all", color:"all", price_from:"all", price_to:"all" 
       })
