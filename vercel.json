@@ -1,7 +1,13 @@
 {
   "functions": {
-    "api/**/*.js": {
+    "api.js": {
       "runtime": "nodejs20.x"
     }
-  }
+  },
+  "rewrites": [
+    {
+      "source": "/api/chat",
+      "destination": "/api.js"
+    }
+  ]
 }
