@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -28,16 +27,11 @@ export default async function handler(req, res) {
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents,
           systemInstruction: formattedSystemInstruction,
-          generationConfig: {
-            temperature: 0,
-            topP: 0.1
-          }
+          generationConfig: { temperature: 0, topP: 0.1 }
         })
       }
     );
@@ -45,13 +39,11 @@ export default async function handler(req, res) {
     const data = await response.json();
     
     if (!response.ok) {
-      console.error('Gemini API error:', data);
       return res.status(response.status).json(data);
     }
 
     return res.status(200).json(data);
   } catch (error) {
-    console.error('API Error:', error);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
