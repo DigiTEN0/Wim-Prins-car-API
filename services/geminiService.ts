@@ -146,18 +146,15 @@ ${voorraadLijst}`;
   let lastError = null;
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
-      // Direct call to Google via CORS proxy (no backend needed!)
-      const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=AIzaSyDXJsIrNv5bLD2G5oRLTgX7iBGRaCfkV-w`;
-      
+      // Call Cloudflare Worker backend
       const response = await fetch(
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`,
+        'https://royal-shadow-679d.digiten-nl.workers.dev',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents,
-            systemInstruction: { parts: [{ text: SYSTEM_INSTRUCTION }] },
-            generationConfig: { temperature: 0, topP: 0.1 }
+            systemInstruction: SYSTEM_INSTRUCTION
           })
         }
       );
